@@ -1,94 +1,107 @@
-/**
- * Data Catalog Project Starter Code - SEA Stage 2
- *
- * This file is where you should be doing most of your work. You should
- * also make changes to the HTML and CSS files, but we want you to prioritize
- * demonstrating your understanding of data structures, and you'll do that
- * with the JavaScript code you write in this file.
- * 
- * The comments in this file are only to help you learn how the starter code
- * works. The instructions for the project are in the README. That said, here
- * are the three things you should do first to learn about the starter code:
- * - 1 - Change something small in index.html or style.css, then reload your 
- *    browser and make sure you can see that change. 
- * - 2 - On your browser, right click anywhere on the page and select
- *    "Inspect" to open the browser developer tools. Then, go to the "console"
- *    tab in the new window that opened up. This console is where you will see
- *    JavaScript errors and logs, which is extremely helpful for debugging.
- *    (These instructions assume you're using Chrome, opening developer tools
- *    may be different on other browsers. We suggest using Chrome.)
- * - 3 - Add another string to the titles array a few lines down. Reload your
- *    browser and observe what happens. You should see a fourth "card" appear
- *    with the string you added to the array, but a broken image.
- * 
- */
+let globalData = [];
+let currentPage = 0;
 
+function createGameCard(game) {  
+    const container = document.getElementById('game-container');
 
-const FRESH_PRINCE_URL = "https://upload.wikimedia.org/wikipedia/en/3/33/Fresh_Prince_S1_DVD.jpg";
-const CURB_POSTER_URL = "https://m.media-amazon.com/images/M/MV5BZDY1ZGM4OGItMWMyNS00MDAyLWE2Y2MtZTFhMTU0MGI5ZDFlXkEyXkFqcGdeQXVyMDc5ODIzMw@@._V1_FMjpg_UX1000_.jpg";
-const EAST_LOS_HIGH_POSTER_URL = "https://static.wikia.nocookie.net/hulu/images/6/64/East_Los_High.jpg";
+    const card = document.createElement('div');
+    card.className = 'game-card';
 
-// This is an array of strings (TV show titles)
-let titles = [
-    "Fresh Prince of Bel Air",
-    "Curb Your Enthusiasm",
-    "East Los High"
-];
-// Your final submission should have much more data than this, and 
-// you should use more than just an array of strings to store it all.
+    const image = document.createElement('img');
+    image.src = game.img_url;
+    image.alt = `Cover image for ${game.name}`;
+    card.appendChild(image);
 
+    const name = document.createElement('h2');
+    name.textContent = game.name;
+    card.appendChild(name);
 
-// This function adds cards the page to display the data in the array
-function showCards() {
-    const cardContainer = document.getElementById("card-container");
-    cardContainer.innerHTML = "";
-    const templateCard = document.querySelector(".card");
+    const price = document.createElement('p'); 
+    price.textContent = !game.price || isNaN(parseFloat(game.price)) ? 'Price: Free' : `Price: $${(parseFloat(game.price) / 100).toFixed(2)}`;
+    card.appendChild(price);
+
+    const developer = document.createElement('p');
+    developer.textContent = `Developed by: ${game.developer}`;
+    card.appendChild(developer);
     
-    for (let i = 0; i < titles.length; i++) {
-        let title = titles[i];
+    const publisher = document.createElement('p');
+    publisher.textContent = `Published by: ${game.publisher}`;
+    card.appendChild(publisher);
+    
+    const date = document.createElement('p');
+    date.textContent = `Release Date: ${game.date}`;
+    card.appendChild(date);
 
-        // This part of the code doesn't scale very well! After you add your
-        // own data, you'll need to do something totally different here.
-        let imageURL = "";
-        if (i == 0) {
-            imageURL = FRESH_PRINCE_URL;
-        } else if (i == 1) {
-            imageURL = CURB_POSTER_URL;
-        } else if (i == 2) {
-            imageURL = EAST_LOS_HIGH_POSTER_URL;
+    container.appendChild(card);
+}
+
+
+function displayPage(pageIndex) {
+    console.log(`Displaying page: ${pageIndex}`);
+    const container = document.getElementById('game-container');
+    container.innerHTML = '';  // Clear existing content
+    const pageData = globalData.slice(pageIndex * 30, (pageIndex + 1) * 30);
+    console.log(`Displaying ${pageData.length} games`);
+    pageData.forEach(game => createGameCard(game));
+}
+
+function displayFilteredGames(games = globalData) {
+    console.log(`Displaying filtered games, count: ${games.length}`);
+    const container = document.getElementById('game-container');
+    container.innerHTML = '';  // Clear previous games
+    games.forEach(game => createGameCard(game));
+}
+
+function setupnavigation() {
+    const nextPageButton = document.createElement('button');
+    nextPageButton.className = 'next-page-btn';
+    nextPageButton.textContent = 'Next Page';
+    nextPageButton.onclick = function() {
+        if (currentPage < Math.floor(globalData.length / 20)) {
+            currentPage++;
+            displayPage(currentPage);
         }
+    };
+    const prevPageButton = document.createElement('button');
+    prevPageButton.className = 'prev-page-btn';
+    prevPageButton.textContent = 'Previous Page';
+    prevPageButton.onclick = function() {
+        if (currentPage > 0) {
+            currentPage--;
+            displayPage(currentPage);
+        }
+    };
 
-        const nextCard = templateCard.cloneNode(true); // Copy the template card
-        editCardContent(nextCard, title, imageURL); // Edit title and image
-        cardContainer.appendChild(nextCard); // Add new card to the container
-    }
+    document.body.appendChild(prevPageButton);
+    document.body.appendChild(nextPageButton);
+}
+function setupSearch() {
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+
+    searchButton.addEventListener('click', function() {
+        const searchTerm = searchInput.value.toLowerCase();
+        if (searchTerm.trim()) {
+            const filteredData = globalData.filter(game =>
+                game.name.toLowerCase().includes(searchTerm)
+            );
+            displayFilteredGames(filteredData);
+        } else {
+            displayPage(currentPage);  // Optionally re-display the current page if search is cleared
+        }
+    });
 }
 
-function editCardContent(card, newTitle, newImageURL) {
-    card.style.display = "block";
+function sort 
 
-    const cardHeader = card.querySelector("h2");
-    cardHeader.textContent = newTitle;
-
-    const cardImage = card.querySelector("img");
-    cardImage.src = newImageURL;
-    cardImage.alt = newTitle + " Poster";
-
-    // You can use console.log to help you debug!
-    // View the output by right clicking on your website,
-    // select "Inspect", then click on the "Console" tab
-    console.log("new card:", newTitle, "- html: ", card);
-}
-
-// This calls the addCards() function when the page is first loaded
-document.addEventListener("DOMContentLoaded", showCards);
-
-function quoteAlert() {
-    console.log("Button Clicked!")
-    alert("I guess I can kiss heaven goodbye, because it got to be a sin to look this good!");
-}
-
-function removeLastCard() {
-    titles.pop(); // Remove last item in titles array
-    showCards(); // Call showCards again to refresh
-}
+document.addEventListener('DOMContentLoaded', function() {
+    fetch('fixed_final_data_new.json')
+    .then(response => response.json())
+    .then(data => {
+        console.log("Data Loaded", data);
+        globalData = data;
+        setupnavigation();
+        displayPage(0);  // Display the first page of results
+        setupSearch();
+    })
+});
