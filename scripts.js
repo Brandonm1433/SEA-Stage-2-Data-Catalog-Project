@@ -114,7 +114,7 @@ function setupSearch() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    fetch('fixed_final_data_new.json')
+    fetch('filtered_output_file.json')
     .then(response => response.json())
     .then(data => {
         console.log("Data Loaded", data);
