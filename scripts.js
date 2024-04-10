@@ -57,7 +57,7 @@ function displayFilteredGames(games = globalData, pageIndex = 0) {
     const pageData = games.slice(pageIndex * itemsPerPage, (pageIndex + 1) * itemsPerPage);
     pageData.forEach(game => createGameCard(game));
 
-    updatePagination(pageIndex, Math.ceil(games.length / itemsPerPage)); // Update pagination controls
+    updatePagination(pageIndex, Math.ceil(games.length / itemsPerPage));
 }
 
 function updatePagination(currentPageIndex, totalPages) {
@@ -67,7 +67,7 @@ function setupnavigation() {
     if (!navWrapper) {
         navWrapper = document.createElement('div');
         navWrapper.className = 'page-navigation';
-        document.body.appendChild(navWrapper); // Ensure this targets a container element that is appropriate
+        document.body.appendChild(navWrapper); 
     }
 
     let prevPageButton = document.querySelector('.prev-page-btn');
@@ -84,7 +84,6 @@ function setupnavigation() {
         nextPageButton.textContent = 'Next Page';
     }
 
-    // Append buttons in the correct order
     navWrapper.appendChild(prevPageButton);
     navWrapper.appendChild(nextPageButton);
 
